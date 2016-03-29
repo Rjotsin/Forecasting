@@ -1,13 +1,15 @@
 # 443 Assignment
-# a)
+# b)
 
-newARMAa <- function(n,ar,ma)
+newARMAb <- function(n,ar)
 {
-	sim.arma <- arima.sim(n=n, list(ar=ar,ma=ma), sd = sqrt(1))
+	sim.arma <- arima.sim(n=n, model=list(ar=ar), sd = sqrt(1))
 	return(sim.arma)
 }
 
-AICmatrixA <- function(n,pstart,pfinish,qstart,qfinish)
+# sim.ar2 <- arima.sim(n=500,model=list(ar=c(0.3,0.1)),sd = sqrt(4))
+
+AICmatrixB <- function(n,pstart,pfinish,qstart,qfinish)
 {
 
 output <- list(); model <- list(); mat <- list(); pqValues <- list(); forecast10 <- list()
@@ -15,7 +17,7 @@ output <- list(); model <- list(); mat <- list(); pqValues <- list(); forecast10
 for (p in 1:30)
 {
 	# Generating simulated data from model 
-	model[[p]] <- newARMAa(n,c(0.5),c(1))
+	model[[p]] <- newARMAb(n,c(0.3))
 	mat[[p]] <- matrix(nrow = pfinish + 1,ncol = qfinish + 1)
 	dimnames(mat[[p]]) <- list(c(pstart:pfinish),c(qstart:qfinish))
 
@@ -43,20 +45,21 @@ out <- list(output,pqValues,forecast10,model)
 return(out)
 }
 
-out <- AICmatrixA(110,0,2,0,2)
+out <- AICmatrixB(30,0,1,0,1)
 matrices <- out[[1]]
 pqVals <- unlist(out[2])
 f10 <- out[[3]]
 models <- out[[4]]
 names(matrices) <- pqVals
 
-freq <- table(pqVals == "11")
+freq <- table(pqVals == "10")
 proportion <- freq[[2]]/(freq[[1]] + freq[[2]])
+
 s10 <- list()
 
 for (i in 1:30)
 {
-	s10[[i]] <- (models[[i]][101:110] - f10[[i]])^2
+	s10[[i]] <- (models[[i]][21:30] - f10[[i]])^2
 }
 
 sum10 <- c(0,0,0,0,0,0,0,0,0,0)
