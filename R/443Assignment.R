@@ -40,7 +40,7 @@ for (p in 1:30)
 	forecast10[p] <- predict(arima(model[[p]][1:(n-10)], order=c(1,0,1)),n.ahead=10)
 }
 
-out <- list(output,pqValues,forecast1,forecast2,forecast5,forecast10)
+out <- list(output,pqValues,forecast1,forecast2,forecast5,forecast10,model)
 return(out)
 }
 
@@ -51,18 +51,31 @@ f1 <- out[[3]]
 f2 <- out[[4]]
 f5 <- out[[5]]
 f10 <- out[[6]]
+models <- out[[7]]
 names(matrices) <- pqVals
 
 freq <- table(pqVals == "11")
 proportion <- freq[[2]]/(freq[[1]] + freq[[2]])
 
-forecast1 <- predict(arima(sim.arma12[1:100], order=c(1,0,1)),n.ahead=1)
-forecast2 <- predict(arima(sim.arma12[1:100], order=c(1,0,1)),n.ahead=2)
-forecast3 <- predict(arima(sim.arma12[1:100], order=c(1,0,1)),n.ahead=5)
-forecast4 <- predict(arima(sim.arma12[1:100], order=c(1,0,1)),n.ahead=10)
+s1 <- list(); s2 <- list(); s5 <- list(); s10 <- list()
 
-# sim.ar2 <- arima.sim(n=500,model=list(ar=c(0.3,0.1)),sd = sqrt(4))
-# sim.ma2 <- arima.sim(n=500,model=list(ma=c(2,1)),sd = sqrt(4))
-# sim.arma11 <- arima.sim(n=500,model=list(ar=-0.8,ma=2),sd = sqrt(4))
+for (i in 1:30)
+{
+	s1[i] <- (models[[i]][101] - f1[[i]])^2
+	s2[[i]] <- (models[[i]][101:102] - f2[[i]])^2
+	s5[[i]] <- (models[[i]][101:105] - f5[[i]])^2
+	s10[[i]] <- (models[[i]][101:110] - f10[[i]])^2
+}
 
-# sim.arma <- arima.sim(n=110, list(ar=c(-.06),ma=c(0.6,-0.3)), sd = sqrt(1))
+sum1 <- 0; sum2 <- c(0,0); sum5 <- c(0,0,0,0,0); sum10 <- c(0,0,0,0,0,0,0,0,0,0)
+
+for (i in 1:30)
+{
+	sum1 <- sum1 + s1[[i]]
+	sum2 <- sum2 + s2[[i]]
+	sum5 <- sum5 + s5[[i]]
+	sum10 <- sum10 + s10[[i]]
+}
+
+mse1 <- sum1/30; mse2 <- sum2/30; mse5 <- sum5/30; mse10 <- sum10/30
+
